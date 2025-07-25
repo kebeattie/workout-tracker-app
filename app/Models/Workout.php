@@ -11,6 +11,7 @@ class Workout extends Model
         'workout_date',
         'type',
         'notes',
+        'user_id',
     ];
     public function user()  {
         return $this->belongsTo(User::class);

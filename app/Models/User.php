@@ -21,9 +21,6 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'workout_date',
-        'type',
-        'notes',
     ];
 
     /**
@@ -52,5 +49,10 @@ class User extends Authenticatable
     public function workouts()
     {
         return $this->hasMany(Workout::class);
+    }
+
+    public function exerciseTemplates()
+    {
+        return $this->hasMany(ExerciseTemplate::class);
     }
 }
