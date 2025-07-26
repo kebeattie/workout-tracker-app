@@ -43,6 +43,15 @@
 
                 {{-- Where exercises will be added --}}
                 <div id="exercise-list" class="mt-4 space-y-4"></div>
+                <div class="flex gap-2 items-end mt-2">
+                <input type="text" id="custom-exercise-name" class="w-full border p-2 rounded" placeholder="Or enter custom exercise" style="display:none;">
+                <button type="button" id="show-custom-exercise" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">
+                    Add Custom Exercise
+                </button>
+                <button type="button" id="add-custom-exercise-btn" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700" style="display:none;">
+                    Add
+                </button>
+</div>
             </div>
 
 
@@ -61,6 +70,7 @@
 
     </div>
     <script>
+        const templateNames = @json($templateNames);
         let exerciseIndex = 0;
 
         document.getElementById('add-exercise-btn').addEventListener('click', function () {
@@ -117,6 +127,56 @@
                 e.target.closest('.exercise-block').remove();
             }
         });
+
+        document.getElementById('show-custom-exercise').addEventListener('click', function () {
+    document.getElementById('custom-exercise-name').style.display = '';
+    document.getElementById('add-custom-exercise-btn').style.display = '';
+    this.style.display = 'none';
+});
+
+document.getElementById('add-custom-exercise-btn').addEventListener('click', function () {
+    const customNameInput = document.getElementById('custom-exercise-name');
+    const customName = customNameInput.value.trim();
+    if (!customName) return;
+
+    // Prevent duplicates
+    const existing = Array.from(document.querySelectorAll('input[name^="exercises"]'))
+        .some(input => input.value === customName);
+    if (existing) return alert("You've already added that exercise.");
+
+    const container = document.createElement('div');
+    container.classList.add('p-4', 'bg-gray-100', 'rounded', 'exercise-block');
+
+    container.innerHTML = `
+        <input type="hidden" name="exercises[${exerciseIndex}][name]" value="${customName}">
+        <div class="flex flex-col sm:flex-row sm:items-center gap-4 mb-2">
+            <div class="flex-1">
+                <label class="block font-medium">Exercise</label>
+                <input type="text" class="w-full border p-2 rounded bg-gray-200" value="${customName}" readonly>
+            </div>
+            <div>
+                <label class="block font-medium">Sets</label>
+                <input type="number" name="exercises[${exerciseIndex}][sets]" class="w-24 border p-2 rounded" required min="1">
+            </div>
+            <div>
+                <label class="block font-medium">Reps</label>
+                <input type="number" name="exercises[${exerciseIndex}][reps]" class="w-24 border p-2 rounded" required min="1">
+            </div>
+            <div>
+                <label class="block font-medium">Weight (kg)</label>
+                <input type="number" name="exercises[${exerciseIndex}][weight]" class="w-28 border p-2 rounded" required min="0" step="0.1">
+            </div>
+            <button type="button" class="remove-exercise text-red-600 text-sm hover:underline mt-6">
+                Remove
+            </button>
+        </div>
+    `;
+
+    document.getElementById('exercise-list').appendChild(container);
+
+    customNameInput.value = '';
+    exerciseIndex++;
+});
     </script>
 
 </x-app-layout>

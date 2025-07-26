@@ -7,4 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 class ExerciseTemplate extends Model
 {
     //
+
+    protected $fillable = ['name', 'user_id'];
 }

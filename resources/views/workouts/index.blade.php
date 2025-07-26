@@ -11,9 +11,16 @@
                         <h3 class="text-lg font-semibold">{{ $workout->type }}</h3>
                         <p class="text-sm text-gray-600">{{ \Carbon\Carbon::parse($workout->workout_date)->toFormattedDateString() }}</p>
                     </div>
-                    <button type="button" class="toggle-details text-blue-600 hover:underline text-sm">
-                        Show Exercises
-                    </button>
+                    <div class="flex gap-2 items-center">
+                        <button type="button" class="toggle-details text-blue-600 hover:underline text-sm">
+                            Show Exercises
+                        </button>
+                        <form action="{{ route('workouts.destroy', $workout) }}" method="POST" onsubmit="return confirm('Delete this workout?');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="text-red-600 hover:underline text-sm">Delete</button>
+                        </form>
+                    </div>
                 </div>
 
                 <div class="exercise-details mt-4 hidden">

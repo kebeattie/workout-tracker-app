@@ -13,10 +13,12 @@ class WorkoutController extends Controller
             ->orderBy('name')
             ->get();
 
-        return view('workouts.create', compact('exerciseTemplates'));
+        $templateNames = $exerciseTemplates->pluck('name')->toArray();
+
+        return view('workouts.create', compact('templateNames', 'exerciseTemplates'));
     }
 
-    public function store(Request $request)
+    public function store(Request $request,)
     {
         $validatedData = $request->validate([
             'workout_date' => 'required|date',
@@ -28,7 +30,12 @@ class WorkoutController extends Controller
             'exercises.*.reps' => 'required|integer|min:1',
             'exercises.*.weight' => 'required|numeric|min:0',
         ]);
-        \Log::info('Validated Data:', $validatedData);
+
+        $templateNames = ExerciseTemplate::whereNull('user_id')
+            ->orWhere('user_id', auth()->id())
+            ->pluck('name')
+            ->toArray();
+
         $workout = auth()->user()->workouts()->create([
             'workout_date' => $validatedData['workout_date'],
             'type' => $validatedData['type'],
@@ -37,7 +44,16 @@ class WorkoutController extends Controller
 
         foreach ($validatedData['exercises'] as $exerciseData) {
             $workout->exercises()->create($exerciseData);
+
+            if(!in_array($exerciseData['name'], $templateNames)) {
+                ExerciseTemplate::create([
+                    'name' => $exerciseData['name'],
+                    'user_id' => auth()->id(),
+                ]);
+            }
         }
+
+
 
         return redirect()->route('workouts.create')->with('success', 'Workout created successfully!');
     }
@@ -47,5 +63,13 @@ class WorkoutController extends Controller
         $workouts = auth()->user()->workouts()->with('exercises')->orderBy('workout_date', 'desc')->get();
         return view('workouts.index', compact('workouts'));
 
+    }
+
+    public function destroy($id)
+    {
+        $workout = auth()->user()->workouts()->findOrFail($id);
+        $workout->delete();
+
+        return redirect()->route('workouts.index')->with('success', 'Workout deleted successfully!');
     }
 }
