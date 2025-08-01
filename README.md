@@ -25,7 +25,7 @@ A Laravel-based web application for logging workouts, tracking progress, and vis
 
 1. **Clone the repository:**
    ```
-   git clone https://github.com/yourusername/workout-tracker-app.git
+   git clone https://github.com/kebeattie/workout-tracker-app.git
    cd workout-tracker-app
    ```
 

@@ -37,17 +37,34 @@ public function getProgressData(Request $request)
         ->where('workouts.user_id', $user->id)
         ->where('exercises.name', $exerciseName)
         ->orderBy('workouts.workout_date')
-        ->select('workouts.workout_date as date', 'exercises.weight')
+        ->select('workouts.workout_date as date', 'exercises.sets', 'exercises.reps', 'exercises.weight')
         ->get();
 
-    $dates = $data->pluck('date')->map(function($d) {
-        return \Carbon\Carbon::parse($d)->toFormattedDateString();
-    })->toArray();
-    $weights = $data->pluck('weight')->toArray();
+    // Group by workout date and sum volume, calculate max e1RM per workout
+    $byDate = [];
+    foreach ($data as $row) {
+        $date = \Carbon\Carbon::parse($row->date)->toFormattedDateString();
+        $volume = $row->sets * $row->reps * $row->weight;
+        $e1rm = $row->weight * (1 + $row->reps / 30);
+
+        if (!isset($byDate[$date])) {
+            $byDate[$date] = ['volume' => 0, 'e1rm' => 0];
+        }
+        $byDate[$date]['volume'] += $volume;
+        // Keep the max e1RM for the workout
+        if ($e1rm > $byDate[$date]['e1rm']) {
+            $byDate[$date]['e1rm'] = round($e1rm, 2);
+        }
+    }
+
+    $dates = array_keys($byDate);
+    $volumes = array_column($byDate, 'volume');
+    $e1rms = array_column($byDate, 'e1rm');
 
     return response()->json([
         'dates' => $dates,
-        'weights' => $weights,
+        'volumes' => $volumes,
+        'e1rms' => $e1rms,
     ]);
 }
 

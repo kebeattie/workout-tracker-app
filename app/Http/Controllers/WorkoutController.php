@@ -18,42 +18,58 @@ class WorkoutController extends Controller
         return view('workouts.create', compact('templateNames', 'exerciseTemplates'));
     }
 
-    public function store(Request $request,)
+   public function store(Request $request)
     {
-        $validatedData = $request->validate([
+        // Common validation rules
+        $rules = [
             'workout_date' => 'required|date',
             'type' => 'required|string',
             'notes' => 'nullable|string',
-            'exercises' => 'required|array',
-            'exercises.*.name' => 'required|string',
-            'exercises.*.sets' => 'required|integer|min:1',
-            'exercises.*.reps' => 'required|integer|min:1',
-            'exercises.*.weight' => 'required|numeric|min:0',
-        ]);
+        ];
+
+        // Add rules based on workout type
+        if ($request->type === 'Running') {
+            $rules['distance'] = 'required|numeric|min:0.01';
+            $rules['duration'] = 'required|integer|min:1';
+            $rules['pace'] = 'nullable|string';
+        } else {
+            $rules['exercises'] = 'required|array';
+            $rules['exercises.*.name'] = 'required|string';
+            $rules['exercises.*.sets'] = 'required|integer|min:1';
+            $rules['exercises.*.reps'] = 'required|integer|min:1';
+            $rules['exercises.*.weight'] = 'required|numeric|min:0';
+        }
+
+        $validatedData = $request->validate($rules);
 
         $templateNames = ExerciseTemplate::whereNull('user_id')
             ->orWhere('user_id', auth()->id())
             ->pluck('name')
             ->toArray();
 
+        // Create workout with running fields if present
         $workout = auth()->user()->workouts()->create([
             'workout_date' => $validatedData['workout_date'],
             'type' => $validatedData['type'],
             'notes' => $validatedData['notes'] ?? null,
+            'distance' => $validatedData['distance'] ?? null,
+            'duration' => $validatedData['duration'] ?? null,
+            'pace' => $validatedData['pace'] ?? null,
         ]);
 
-        foreach ($validatedData['exercises'] as $exerciseData) {
-            $workout->exercises()->create($exerciseData);
+        // Only add exercises if not running
+        if ($request->type !== 'Running' && isset($validatedData['exercises'])) {
+            foreach ($validatedData['exercises'] as $exerciseData) {
+                $workout->exercises()->create($exerciseData);
 
-            if(!in_array($exerciseData['name'], $templateNames)) {
-                ExerciseTemplate::create([
-                    'name' => $exerciseData['name'],
-                    'user_id' => auth()->id(),
-                ]);
+                if (!in_array($exerciseData['name'], $templateNames)) {
+                    ExerciseTemplate::create([
+                        'name' => $exerciseData['name'],
+                        'user_id' => auth()->id(),
+                    ]);
+                }
             }
         }
-
-
 
         return redirect()->route('workouts.create')->with('success', 'Workout created successfully!');
     }

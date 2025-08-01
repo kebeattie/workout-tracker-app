@@ -65,7 +65,8 @@
     <script>
         document.querySelectorAll('.toggle-details').forEach(button => {
             button.addEventListener('click', () => {
-                const details = button.closest('div').nextElementSibling;
+                const card = button.closest('.bg-white.rounded.shadow.p-4');
+                const details = card.querySelector('.exercise-details');
                 details.classList.toggle('hidden');
                 button.textContent = details.classList.contains('hidden') ? 'Show Exercises' : 'Hide Exercises';
             });

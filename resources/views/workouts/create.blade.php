@@ -4,6 +4,11 @@
     </x-slot>
 
     <div class="max-w-2xl mx-auto mt-6 p-6 bg-white rounded shadow">
+        @if (session('success'))
+            <div class="mb-4 p-3 rounded bg-green-100 text-green-800 border border-green-300">
+                {{ session('success') }}
+            </div>
+        @endif
         <form action="{{ route('workouts.store')}}" method="POST">
             @csrf
 
@@ -16,13 +21,16 @@
 
             <div class="mb-4">
                 <label for="type" class="block font-medium">Workout Type</label>
-                <input type="text" name="type" id="type" class="w-full border p-2 rounded"
-                    placeholder="Push, Pull, Cardio, etc." value="{{ old('type') }}" required>
+                <select name="type" id="type" class="w-full border p-2 rounded" required>
+                    <option value="">Select Type</option>
+                    <option value="Weightlifting">Weightlifting</option>
+                    <option value="Running">Running</option>
+                    <!-- Add more types as needed -->
+                </select>
                 @error('type') <p class="text-red-500 text-sm">{{ $message }}</p> @enderror
             </div>
             <div id="exercise-section" class="mb-4">
                 <h3 class="font-semibold mb-2">Exercises</h3>
-
                 {{-- Select dropdown --}}
                 <div class="flex gap-2 items-end">
                     <div class="flex-1">
@@ -34,27 +42,38 @@
                             @endforeach
                         </select>
                     </div>
-
                     <button type="button" id="add-exercise-btn"
                         class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
                         Add Exercise
                     </button>
                 </div>
-
                 {{-- Where exercises will be added --}}
                 <div id="exercise-list" class="mt-4 space-y-4"></div>
                 <div class="flex gap-2 items-end mt-2">
-                <input type="text" id="custom-exercise-name" class="w-full border p-2 rounded" placeholder="Or enter custom exercise" style="display:none;">
-                <button type="button" id="show-custom-exercise" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">
-                    Add Custom Exercise
-                </button>
-                <button type="button" id="add-custom-exercise-btn" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700" style="display:none;">
-                    Add
-                </button>
-</div>
+                    <input type="text" id="custom-exercise-name" class="w-full border p-2 rounded" placeholder="Or enter custom exercise" style="display:none;">
+                    <button type="button" id="show-custom-exercise" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">
+                        Add Custom Exercise
+                    </button>
+                    <button type="button" id="add-custom-exercise-btn" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700" style="display:none;">
+                        Add
+                    </button>
+                </div>
             </div>
 
+            <!-- Weightlifting Section -->
+            <div id="weightlifting-section" class="mb-4">
+                <!-- Your existing exercise picker and list go here -->
+            </div>
 
+            <!-- Running Section (initially hidden) -->
+            <div id="running-section" class="mb-4" style="display:none;">
+                <label class="block font-medium">Distance (km)</label>
+                <input type="number" name="distance" class="w-full border p-2 rounded" min="0" step="0.01">
+                <label class="block font-medium mt-2">Duration (minutes)</label>
+                <input type="number" name="duration" class="w-full border p-2 rounded" min="0" step="1">
+                <label class="block font-medium mt-2">Pace (min/km)</label>
+                <input type="text" name="pace" class="w-full border p-2 rounded">
+            </div>
 
             <div class="mb-4">
                 <label for="notes" class="block font-medium">Notes</label>
@@ -176,6 +195,13 @@ document.getElementById('add-custom-exercise-btn').addEventListener('click', fun
 
     customNameInput.value = '';
     exerciseIndex++;
+});
+
+document.getElementById('type').addEventListener('change', function() {
+    const type = this.value;
+    document.getElementById('weightlifting-section').style.display = (type === 'Weightlifting') ? '' : 'none';
+    document.getElementById('running-section').style.display = (type === 'Running') ? '' : 'none';
+    document.getElementById('exercise-section').style.display = (type === 'Weightlifting') ? '' : 'none';
 });
     </script>
 
