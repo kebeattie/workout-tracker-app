@@ -12,6 +12,9 @@ class Workout extends Model
         'type',
         'notes',
         'user_id',
+        'distance',
+        'duration',
+        'pace',
     ];
     public function user()  {
         return $this->belongsTo(User::class);

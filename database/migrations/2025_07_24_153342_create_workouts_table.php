@@ -18,9 +18,9 @@ return new class extends Migration
             $table->date('workout_date');
             $table->string('type');
             $table->text('notes')->nullable();
-            $table->decimal('distance', 6, 2)->nullable()->after('notes');
-            $table->integer('duration')->nullable()->after('distance');
-            $table->string('pace')->nullable()->after('duration');
+            $table->decimal('distance', 6, 2)->nullable();
+            $table->integer('duration')->nullable();
+            $table->string('pace')->nullable();
         });
     }
 

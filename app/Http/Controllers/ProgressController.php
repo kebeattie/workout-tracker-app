@@ -68,4 +68,28 @@ public function getProgressData(Request $request)
     ]);
 }
 
+public function getRunProgressData(Request $request)
+{
+    $user = auth()->user();
+
+    $runs = \DB::table('workouts')
+        ->where('user_id', $user->id)
+        ->where('type', 'Running')
+        ->orderBy('workout_date')
+        ->select('workout_date', 'distance', 'duration')
+        ->get();
+
+    $dates = $runs->pluck('workout_date')->map(function($d) {
+        return \Carbon\Carbon::parse($d)->toFormattedDateString();
+    })->toArray();
+    $distances = $runs->pluck('distance')->toArray();
+    $durations = $runs->pluck('duration')->toArray();
+
+    return response()->json([
+        'dates' => $dates,
+        'distances' => $distances,
+        'durations' => $durations,
+    ]);
+}
+
 }

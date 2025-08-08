@@ -18,7 +18,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/workouts/{id}', [WorkoutController::class, 'destroy'])->name('workouts.destroy'); 
     Route::get('/progress', [ProgressController::class, 'index'])->name('progress');
     Route::get('/api/progress-data', [ProgressController::class, 'getProgressData'])->middleware('auth');
-     
+    Route::get('/api/run-progress-data', [ProgressController::class, 'getRunProgressData'])->middleware('auth');
+
 });
 
 require __DIR__.'/auth.php';

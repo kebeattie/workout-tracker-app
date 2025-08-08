@@ -71,8 +71,6 @@
                 <input type="number" name="distance" class="w-full border p-2 rounded" min="0" step="0.01">
                 <label class="block font-medium mt-2">Duration (minutes)</label>
                 <input type="number" name="duration" class="w-full border p-2 rounded" min="0" step="1">
-                <label class="block font-medium mt-2">Pace (min/km)</label>
-                <input type="text" name="pace" class="w-full border p-2 rounded">
             </div>
 
             <div class="mb-4">

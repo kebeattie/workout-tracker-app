@@ -47,6 +47,15 @@ class WorkoutController extends Controller
             ->pluck('name')
             ->toArray();
 
+        if ($request->type === 'Running') {
+            $distance = $validatedData['distance'];
+            $duration = $validatedData['duration'];
+            // Avoid division by zero
+            $pace = ($distance > 0) ? round($duration / $distance, 2) : null;
+        } else {
+            $pace = null;
+}
+
         // Create workout with running fields if present
         $workout = auth()->user()->workouts()->create([
             'workout_date' => $validatedData['workout_date'],
@@ -54,7 +63,7 @@ class WorkoutController extends Controller
             'notes' => $validatedData['notes'] ?? null,
             'distance' => $validatedData['distance'] ?? null,
             'duration' => $validatedData['duration'] ?? null,
-            'pace' => $validatedData['pace'] ?? null,
+            'pace' => $pace ?? null,
         ]);
 
         // Only add exercises if not running
