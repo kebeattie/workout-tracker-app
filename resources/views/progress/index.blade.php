@@ -26,6 +26,10 @@
             <button id="show-run-both" class="bg-gray-300 text-gray-800 px-3 py-1 rounded">Both</button>
         </div>
 
+        <div id="loading-indicator" class="text-center my-4" style="display:none;">
+            <span class="inline-block animate-spin mr-2">&#9696;</span> Loading...
+        </div>
+
         <canvas id="mainChart" width="600" height="400"></canvas>
     </div>
 
@@ -217,8 +221,16 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    function showLoading() {
+        document.getElementById('loading-indicator').style.display = '';
+    }
+    function hideLoading() {
+        document.getElementById('loading-indicator').style.display = 'none';
+    }
+
     // --- Chart mode switching ---
     async function showExerciseChart(mode = 'volume') {
+        showLoading();
         document.getElementById('exercise-controls').style.display = '';
         document.getElementById('run-controls').style.display = 'none';
         document.getElementById('show-exercise-mode').classList.add('bg-blue-600', 'text-white');
@@ -227,8 +239,10 @@ document.addEventListener('DOMContentLoaded', function() {
         selectedExercise = document.getElementById('exercise-select').value;
         const data = await fetchExerciseChartData(mode, selectedExercise);
         renderExerciseChart(data.dates, data.volumes, data.e1rms, mode);
+        hideLoading();
     }
     async function showRunChart(mode = 'distance') {
+        showLoading();
         document.getElementById('exercise-controls').style.display = 'none';
         document.getElementById('run-controls').style.display = '';
         document.getElementById('show-run-mode').classList.add('bg-blue-600', 'text-white');
@@ -236,6 +250,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('show-exercise-mode').classList.add('bg-gray-300', 'text-gray-800');
         const data = await fetchRunChartData();
         renderRunChart(data.dates, data.distances, data.durations, mode);
+        hideLoading();
     }
 
     // --- Button event listeners ---
