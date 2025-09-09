@@ -11,7 +11,7 @@
 
         <div id="exercise-controls" class="mb-4">
             <label for="exercise-select" class="block mb-2 font-semibold">Select Exercise:</label>
-            <select id="exercise-select" class="mb-4 p-2 border rounded">
+            <select id="exercise-select" class="mb-4 p-2 border rounded" style="min-width: 300px; max-width: 100%;">
                 @foreach ($topExercises as $exercise)
                     <option value="{{ $exercise }}">{{ $exercise }}</option>
                 @endforeach
